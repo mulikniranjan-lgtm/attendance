@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assignments Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app-bg"></div>
+  <header class="topbar glass">
+    <h1>Attendance Tracker</h1>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+      <button class="nav-btn" data-page="weekly">Weekly View</button>
+      <button class="nav-btn" data-page="calendar">Calendar View</button>
+      <button class="nav-btn" data-page="manage">Manage Timetable</button>
+      <a href="assignments.html" class="nav-btn">Assignments</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="dashboard" class="page active">
+      <h2>Dashboard</h2>
+      <div class="stats-grid" id="overallStats"></div>
+      <h3>Subject Attendance</h3>
+      <div id="subjectCards" class="subject-grid"></div>
+    </section>
+
+    <section id="weekly" class="page">
+      <h2>Weekly Attendance View</h2>
+      <p class="hint">Mark attendance for this week. Entries are stored by date and lecture.</p>
+      <div id="weeklyGrid" class="week-grid"></div>
+    </section>
+
+    <section id="calendar" class="page">
+      <div class="calendar-header glass">
+        <button id="prevMonth" aria-label="Previous month">◀</button>
+        <h2 id="monthTitle"></h2>
+        <button id="nextMonth" aria-label="Next month">▶</button>
+      </div>
+      <div id="calendarGrid" class="calendar-grid glass"></div>
+      <div id="dateEditor" class="glass date-editor">
+        <h3 id="selectedDateTitle">Select a date</h3>
+        <div id="selectedDatePeriods"></div>
+      </div>
+    </section>
+
+    <section id="manage" class="page">
+      <h2>Manage Timetable</h2>
+      <p class="hint">Edit subjects and time slots for Monday to Friday. Changes auto-update all views.</p>
+      <div id="manageDays" class="manage-days"></div>
+      <div class="actions-row">
+        <button id="saveTimetable" class="primary">Save Timetable</button>
+        <span id="saveMessage" class="save-msg" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+  </main>
+
+  <template id="periodRowTemplate">
+    <div class="period-row glass-soft">
+      <input type="text" class="period-time" placeholder="10:00-12:00" />
+      <input type="text" class="period-subject" placeholder="Subject name" />
+      <button class="danger delete-period" type="button">Delete</button>
+    </div>
+  </template>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSCptvigfwdqLwt9irUALIUGLJuoXzvs4",
+    authDomain: "attendance-tracker-59a61.firebaseapp.com",
+    projectId: "attendance-tracker-59a61",
+    storageBucket: "attendance-tracker-59a61.firebasestorage.app",
+    messagingSenderId: "514042625397",
+    appId: "1:514042625397:web:068a41c4af5e1691e2673c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+</script>
+
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

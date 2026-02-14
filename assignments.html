@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assignments & Experiments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app-bg"></div>
+
+  <header class="topbar glass">
+    <h1>Assignments & Experiments</h1>
+    <nav class="nav">
+      <a href="index.html">
+        <button class="primary">← Back to Attendance</button>
+      </a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="assignment-container">
+
+      <div class="assignment-form glass">
+        <input type="text" id="title" placeholder="Assignment / Experiment Title">
+        <input type="text" id="subject" placeholder="Subject">
+        <input type="date" id="dueDate">
+        <button class="primary" onclick="addTask()">Add</button>
+      </div>
+
+      <div id="taskList"></div>
+
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "assignment_tasks_v1";
+    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const title = document.getElementById("title").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const dueDate = document.getElementById("dueDate").value;
+
+      if (!title || !dueDate) {
+        alert("Enter title and due date");
+        return;
+      }
+
+      tasks.push({
+        id: Date.now(),
+        title,
+        subject,
+        dueDate,
+        completed: false
+      });
+
+      saveTasks();
+      renderTasks();
+
+      document.getElementById("title").value = "";
+      document.getElementById("subject").value = "";
+      document.getElementById("dueDate").value = "";
+    }
+
+    function toggleComplete(id) {
+      tasks = tasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      );
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(task => task.id !== id);
+      saveTasks();
+      renderTasks();
+    }
+
+    function getRemainingDays(dueDate) {
+      const today = new Date();
+      const due = new Date(dueDate);
+      const diff = due - today;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+
+      if (!tasks.length) {
+        list.innerHTML = `<p class="hint">No assignments added yet.</p>`;
+        return;
+      }
+
+      tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+      tasks.forEach(task => {
+        const daysLeft = getRemainingDays(task.dueDate);
+
+        let statusClass = "safe";
+        if (daysLeft <= 2) statusClass = "urgent";
+        else if (daysLeft <= 5) statusClass = "warning";
+
+        const div = document.createElement("div");
+        div.className = `assignment-card ${statusClass}`;
+        div.innerHTML = `
+          <h3 style="${task.completed ? 'text-decoration:line-through;opacity:0.6;' : ''}">
+            ${task.title}
+          </h3>
+          <p class="assignment-meta">Subject: ${task.subject || "—"}</p>
+          <p class="assignment-meta">Due: ${task.dueDate}</p>
+          <p class="assignment-meta">Remaining: ${daysLeft} day(s)</p>
+          <button onclick="toggleComplete(${task.id})">
+            ${task.completed ? "Undo" : "Mark Completed"}
+          </button>
+          <button class="delete-task" onclick="deleteTask(${task.id})">
+            Delete
+          </button>
+        `;
+
+        list.appendChild(div);
+      });
+    }
+
+    renderTasks();
+  </script>
+</body>
+</html>
